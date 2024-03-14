@@ -1,10 +1,12 @@
 import React from 'react'
-import Header from '../components/header/Header'
 
 const Home = () => {
+    const userDetails = JSON.parse(localStorage.getItem('user') as string);
+    console.log(userDetails);
+
     return (
         <main>
-            <Header />
+            <h1>HOME</h1>
         </main>
     )
 }

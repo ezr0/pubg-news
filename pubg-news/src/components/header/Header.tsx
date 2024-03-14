@@ -14,10 +14,13 @@ const Header = () => {
 
     return (
         <Grid
-            sx={{
-                backgroundColor: 'background.level1',
+            sx={(theme) => ({
+                backgroundColor: 'rgba(255 255 255 / 0.2)',
+                [theme.getColorSchemeSelector('dark')]: {
+                    backgroundColor: 'rgba(19 19 24 / 1)',
+                },
                 padding: '5px 10px',
-            }}
+            })}
             container
         >
             <Grid
