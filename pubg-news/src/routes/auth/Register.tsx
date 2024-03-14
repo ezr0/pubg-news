@@ -9,6 +9,7 @@ import Divider from '@mui/joy/Divider'
 import FormControl from '@mui/joy/FormControl'
 import FormLabel from '@mui/joy/FormLabel'
 import GlobalStyles from '@mui/joy/GlobalStyles'
+import Header from '../../components/header/Header'
 import Link from '@mui/joy/Link'
 import Input from '@mui/joy/Input'
 import Typography from '@mui/joy/Typography'
@@ -51,6 +52,7 @@ const Register = () => {
 
     return (
         <>  
+            <Header />
             {alert && <Alert color={alert.color} text={alert.text} />}
             <GlobalStyles
                 styles={{
@@ -174,7 +176,7 @@ const Register = () => {
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
-                    backgroundImage: 'url(https://images.unsplash.com/photo-1527181152855-fc03fc7949c8?auto=format&w=1000&dpr=2)',
+                    backgroundImage: 'url(https://i.postimg.cc/BbJPzKhS/1.jpg)',
                     [theme.getColorSchemeSelector('dark')]: {
                         backgroundImage: 'url(https://i.postimg.cc/BbJPzKhS/1.jpg)',
                     },

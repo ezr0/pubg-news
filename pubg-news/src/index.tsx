@@ -41,10 +41,7 @@ root.render(
     <React.StrictMode>
         <CssVarsProvider defaultMode="dark">
             <CssBaseline />
-            <main>
-                <Header />
-                <RouterProvider router={router} />
-            </main>
+            <RouterProvider router={router} />
         </CssVarsProvider>
     </React.StrictMode>
 )
