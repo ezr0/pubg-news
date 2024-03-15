@@ -47,7 +47,7 @@ const Header = () => {
         navigate('/')
     }
 
-    const logoImage = mode === 'light' ? 'logo-black.png' : 'logo.png'
+    const logoImage = mode === 'light' ? 'logo.png' : 'logo.png'
 
     return (
         <Grid
