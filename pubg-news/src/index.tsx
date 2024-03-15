@@ -8,11 +8,11 @@ import CssBaseline from '@mui/joy/CssBaseline'
 import '@fontsource/inter'
 
 import Login from './routes/auth/Login'
-import Header from './components/header/Header'
 import Home from './routes/Home'
 import NotFound from './routes/NotFound'
 import Register from './routes/auth/Register'
 import reportWebVitals from './reportWebVitals'
+import UserProfile from './routes/auth/UserProfile'
 
 const router = createBrowserRouter([
     {
@@ -28,6 +28,11 @@ const router = createBrowserRouter([
     {
         path: '/register',
         element: <Register />,
+        errorElement: <NotFound />,
+    },
+    {
+        path: '/user-profile',
+        element: <UserProfile />,
         errorElement: <NotFound />,
     },
     {

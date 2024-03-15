@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useColorScheme } from '@mui/joy/styles'
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import Avatar from '@mui/joy/Avatar'
 import Box from '@mui/joy/Box'
 import Button from '@mui/joy/Button'
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
-import LightModeIcon from '@mui/icons-material/LightMode'
+import Dropdown from '@mui/joy/Dropdown'
 import Grid from '@mui/joy/Grid'
 import IconButton from '@mui/joy/IconButton'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import ListDivider from '@mui/joy/ListDivider'
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined'
+import Menu from '@mui/joy/Menu'
+import MenuButton from '@mui/joy/MenuButton'
+import MenuItem from '@mui/joy/MenuItem'
 import Typography from '@mui/joy/Typography'
 
 interface UserDetails {
@@ -32,6 +39,12 @@ const Header = () => {
 
     const handleLogin = () => {
         navigate('/login')
+    }
+
+    const handleLogout = () => {
+        localStorage.removeItem('user')
+        setActiveUser(null)
+        navigate('/')
     }
 
     const logoImage = mode === 'light' ? 'logo-black.png' : 'logo.png'
@@ -69,32 +82,65 @@ const Header = () => {
             >
                 {activeUser ? (
                     <>
-                        <Avatar
-                            sx={{
-                                mr: 1,
-                            }}
-                            variant="outlined"
-                            size="sm"
-                            src={activeUser.photoURL}
-                        />
-                        <Box
-                            sx={{
-                                mr: 2,
-                            }}
-                        >
-                            <Typography level="title-sm">{activeUser.displayName}</Typography>
-                            <Typography level="body-xs">{activeUser.email}</Typography>
-                        </Box>
+                        <IconButton sx={{ mr: 2 }} variant="outlined" color="neutral" size="md" onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
+                            {mode === 'light' ? <DarkModeRoundedIcon /> : <LightModeIcon />}
+                        </IconButton>
+                        <Dropdown>
+                            <MenuButton variant="plain" size="sm" sx={{ maxWidth: '32px', maxHeight: '32px', borderRadius: '9999999px' }}>
+                                <Avatar
+                                    sx={{
+                                        maxWidth: '32px', 
+                                        maxHeight: '32px'
+                                    }}
+                                    src={activeUser.photoURL}
+                                />
+                            </MenuButton>
+                            <Menu
+                                placement="bottom-end"
+                                size="sm"
+                                sx={{
+                                    zIndex: '99999',
+                                    p: 1,
+                                    gap: 1,
+                                    '--ListItem-radius': 'var(--joy-radius-sm)',
+                                }}
+                            >
+                                <MenuItem>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Avatar src={activeUser.photoURL} sx={{ borderRadius: '50%' }} />
+                                        <Box sx={{ ml: 1.5 }}>
+                                            <Typography level="title-sm" textColor="text.primary">
+                                                {activeUser.displayName}
+                                            </Typography>
+                                            <Typography level="body-xs" textColor="text.tertiary">
+                                                {activeUser.email}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </MenuItem>
+                                <ListDivider />
+                                <MenuItem component="a" href="/user-profile">
+                                    <AccountCircleOutlinedIcon />
+                                    User Profile
+                                </MenuItem>
+                                <ListDivider />
+                                <MenuItem onClick={handleLogout}>
+                                    <LogoutOutlinedIcon />
+                                    Log out
+                                </MenuItem>
+                            </Menu>
+                        </Dropdown>
                     </>
                 ) : (
                     <Button sx={{ mr: 1 }} onClick={handleLogin}>
                         Login
                     </Button>
                 )}
-
-                <IconButton variant="outlined" color="neutral" size="md" onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}>
-                    {mode === 'light' ? <DarkModeRoundedIcon /> : <LightModeIcon />}
-                </IconButton>
             </Grid>
         </Grid>
     )

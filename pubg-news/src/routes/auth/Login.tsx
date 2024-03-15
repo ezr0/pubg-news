@@ -32,7 +32,7 @@ const Register = () => {
             const auth = getAuth();
             await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
                 if (userCredential.user.emailVerified) {
-                    localStorage.setItem('user', JSON.stringify(userCredential.user.providerData));
+                    localStorage.setItem('user', JSON.stringify(userCredential.user));
                     navigate('/')
                 } else {
                     setAlert({ color: 'warning', text: 'Please verify your email address.' })

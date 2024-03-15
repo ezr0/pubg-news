@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification  } from "firebase/auth";
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useRef } from 'react'
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 
+import Avatar from '@mui/joy/Avatar'
 import Alert from '../../components/alert/Alert'
 import Box from '@mui/joy/Box'
 import Button from '@mui/joy/Button'
+import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined'
 import Divider from '@mui/joy/Divider'
 import FormControl from '@mui/joy/FormControl'
 import FormLabel from '@mui/joy/FormLabel'
@@ -16,42 +18,66 @@ import Typography from '@mui/joy/Typography'
 import Stack from '@mui/joy/Stack'
 
 interface AlertState {
-    color: 'success' | 'warning' | 'danger' | 'neutral';
-    text: string;
+    color: 'success' | 'warning' | 'danger' | 'neutral'
+    text: string
 }
 
 const Register = () => {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [alert, setAlert] = useState<AlertState | null>(null);
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [displayName, setDisplayName] = useState('')
+    const [avatar, setAvatar] = useState<File | null>(null)
+    const [alert, setAlert] = useState<AlertState | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
 
-    const handleRegistration = async (event: any) => {
-        event.preventDefault();
+    const inputRef = useRef<HTMLInputElement>(null)
+
+    const handleRegistration = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
         if (password !== confirmPassword) {
-            setAlert({ color: 'danger', text: "Passwords don't match" });
-            return;
+            setAlert({ color: 'danger', text: "Passwords don't match" })
+            return
         }
+        setIsLoading(true)
         try {
-            const auth = getAuth();
-            await createUserWithEmailAndPassword(auth, email, password)
-                .then(async (userCredential) => {
-                    await sendEmailVerification(userCredential.user);
-                    setAlert({ color: 'success', text: 'Please verify your email address.' })
-                    setTimeout(() => {
-                        navigate('/login')
-                    }, 5000);
-                }).catch((error) => {
+            const auth = getAuth()
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+
+            if (displayName) {
+                await updateProfile(userCredential.user, { displayName: displayName })
+            }
+
+            if (avatar) {
+                try {
+                    const storage = getStorage()
+                    const storageRef = ref(storage, `avatars/${userCredential.user.uid}/${avatar.name}`)
+                    await uploadBytes(storageRef, avatar)
+                    const downloadURL = await getDownloadURL(storageRef)
+                    await updateProfile(userCredential.user, { photoURL: downloadURL })
+                } catch (error: any) {
                     setAlert({ color: 'danger', text: error.message })
-                })
+                }
+            }
+
+            await sendEmailVerification(userCredential.user)
+            setAlert({ color: 'success', text: 'Please verify your email address.' })
         } catch (error: any) {
-            setAlert({ color: 'danger', text: error.message });
+            setAlert({ color: 'danger', text: error.message })
+        } finally {
+            setIsLoading(false)
         }
-    };
+    }
+
+    const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0]
+            setAvatar(file)
+        }
+    }
 
     return (
-        <>  
+        <>
             <Header />
             {alert && <Alert color={alert.color} text={alert.text} />}
             <GlobalStyles
@@ -134,6 +160,24 @@ const Register = () => {
                         </Divider>
                         <Stack gap={4} sx={{ mt: 2 }}>
                             <form onSubmit={handleRegistration}>
+                                <FormControl>
+                                    <Avatar
+                                        sx={{
+                                            mr: 1,
+                                            cursor: 'pointer',
+                                        }}
+                                        variant="outlined"
+                                        size="lg"
+                                        onClick={() => inputRef.current?.click()}
+                                    >
+                                        {avatar ? <img src={URL.createObjectURL(avatar)} alt="Avatar" /> : <CameraAltOutlinedIcon />}
+                                        <input type="file" name="avatar" onChange={handleAvatarChange} accept="image/*" style={{ display: 'none' }} ref={inputRef} />
+                                    </Avatar>
+                                </FormControl>
+                                <FormControl required>
+                                    <FormLabel>Display Name</FormLabel>
+                                    <Input type="text" name="displayName" onChange={(e) => setDisplayName(e.target.value)} />
+                                </FormControl>
                                 <FormControl required>
                                     <FormLabel>Email</FormLabel>
                                     <Input type="email" name="email" onChange={(e) => setEmail(e.target.value)} />
@@ -147,7 +191,7 @@ const Register = () => {
                                     <Input type="password" name="password" onChange={(e) => setConfirmPassword(e.target.value)} />
                                 </FormControl>
                                 <Stack gap={4} sx={{ mt: 2 }}>
-                                    <Button type="submit" fullWidth>
+                                    <Button type="submit" fullWidth loading={isLoading}>
                                         Register
                                     </Button>
                                 </Stack>
