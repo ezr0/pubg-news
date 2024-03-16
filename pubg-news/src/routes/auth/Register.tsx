@@ -1,6 +1,9 @@
 import React, { useState, useRef } from 'react'
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth'
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { doc, setDoc } from 'firebase/firestore';
+// @ts-ignore
+import db from '../../firebase.js';
 
 import Avatar from '@mui/joy/Avatar'
 import Alert from '../../components/alert/Alert'
@@ -59,6 +62,17 @@ const Register = () => {
                     setAlert({ color: 'danger', text: error.message })
                 }
             }
+
+            await setDoc(doc(db, 'users', userCredential.user.uid), {
+                uid: userCredential.user.uid,
+                displayName: userCredential.user.displayName || '',
+                email: userCredential.user.email || '',
+                photoURL: userCredential.user.photoURL || '',
+                created: userCredential.user.metadata.creationTime || '',
+                updated: '',
+                permissions: 'user',
+                deleted: false
+            })
 
             await sendEmailVerification(userCredential.user)
             setAlert({ color: 'success', text: 'Please verify your email address.' })

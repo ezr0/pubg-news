@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { getDoc, doc } from 'firebase/firestore'
+// @ts-ignore
+import db from '../../firebase.js'
 import { useNavigate } from 'react-router-dom'
 
 import Alert from '../../components/alert/Alert'
@@ -16,35 +19,42 @@ import Typography from '@mui/joy/Typography'
 import Stack from '@mui/joy/Stack'
 
 interface AlertState {
-    color: 'success' | 'warning' | 'danger' | 'neutral';
-    text: string;
+    color: 'success' | 'warning' | 'danger' | 'neutral'
+    text: string
 }
 
 const Register = () => {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [alert, setAlert] = useState<AlertState | null>(null);
+    const navigate = useNavigate()
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [alert, setAlert] = useState<AlertState | null>(null)
 
     const handleLogin = async (event: any) => {
-        event.preventDefault();
+        event.preventDefault()
         try {
-            const auth = getAuth();
+            const auth = getAuth()
             await signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
                 if (userCredential.user.emailVerified) {
-                    localStorage.setItem('user', JSON.stringify(userCredential.user));
-                    navigate('/')
+                    const userRef = doc(db, 'users', userCredential.user.uid);
+                    getDoc(userRef).then((doc) => {
+                        if (doc.exists()) {
+                            localStorage.setItem('user', JSON.stringify(doc.data()))
+                            navigate('/')
+                        } else {
+                            setAlert({ color: 'danger', text: 'No such user.' })
+                        }
+                    })
                 } else {
                     setAlert({ color: 'warning', text: 'Please verify your email address.' })
                 }
             })
         } catch (error: any) {
-            setAlert({ color: 'danger', text: error.message });
+            setAlert({ color: 'danger', text: error.message })
         }
-    };
+    }
 
     return (
-        <>  
+        <>
             <Header />
             {alert && <Alert color={alert.color} text={alert.text} />}
             <GlobalStyles
