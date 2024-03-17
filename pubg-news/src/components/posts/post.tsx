@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import AspectRatio from '@mui/joy/AspectRatio'
-import Badge from '@mui/joy/Badge';
+import Badge from '@mui/joy/Badge'
 import Card from '@mui/joy/Card'
 import CardContent from '@mui/joy/CardContent'
 import CardOverflow from '@mui/joy/CardOverflow'
@@ -21,10 +21,15 @@ type PostProps = {
     title: React.ReactNode
     datePosted: string
     comments: number
+    tags: TagType[]
+}
+
+type TagType = {
+    label: string
 }
 
 const Post = (props: PostProps) => {
-    const { category, title, popularPost = false, liked = false, image, datePosted, comments } = props
+    const { category, title, popularPost = false, liked = false, image, datePosted, comments, tags } = props
     const [isLiked, setIsLiked] = useState(liked)
 
     return (
@@ -115,6 +120,11 @@ const Post = (props: PostProps) => {
                     <Typography level="title-sm" sx={{ flexGrow: 1, textAlign: 'left' }}>
                         <strong>{datePosted}</strong>
                     </Typography>
+                    {tags.map((tag, index) => (
+                        <Chip key={index} variant="soft" color="primary" size="md" sx={{ marginLeft: '4px' }}>
+                            <b>{tag.label}</b>
+                        </Chip>
+                    ))}
                 </Stack>
             </CardContent>
         </Card>
