@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import AspectRatio from '@mui/joy/AspectRatio'
 import Badge from '@mui/joy/Badge'
 import Card from '@mui/joy/Card'
@@ -7,39 +9,57 @@ import CardOverflow from '@mui/joy/CardOverflow'
 import Chip from '@mui/joy/Chip'
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded'
 import IconButton from '@mui/joy/IconButton'
-import Link from '@mui/joy/Link'
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined'
 import Stack from '@mui/joy/Stack'
 import Typography from '@mui/joy/Typography'
 import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded'
 
 type PostProps = {
+    id: string
     category: React.ReactNode
+    description: string
     image: string
     liked?: boolean
     popularPost?: boolean
     title: React.ReactNode
     datePosted: string
-    comments: number
+    comments: CommentType[]
     tags: TagType[]
+}
+
+type CommentType = {
+    id: string
+    uid: string
+    displayName: string
+    photoURL: string
+    created: string
+    content: string
 }
 
 type TagType = {
     label: string
 }
 
-const Post = (props: PostProps) => {
+const PostCard = (props: PostProps) => {
     const { category, title, popularPost = false, liked = false, image, datePosted, comments, tags } = props
     const [isLiked, setIsLiked] = useState(liked)
+    const navigate = useNavigate()
+
+    const handlePostClick = () => {
+        navigate(`/post/${props.id}`, { state: props })
+    }
 
     return (
         <Card
+            onClick={handlePostClick}
             variant="outlined"
             orientation="horizontal"
             sx={{
                 bgcolor: 'neutral.softBg',
                 display: 'flex',
                 flexDirection: { xs: 'column', sm: 'row' },
+                width: '100%',
+                cursor: 'pointer',
                 '&:hover': {
                     boxShadow: 'lg',
                     borderColor: 'var(--joy-palette-neutral-outlinedDisabledBorder)',
@@ -92,11 +112,7 @@ const Post = (props: PostProps) => {
                 <Stack spacing={1} direction="row" justifyContent="space-between" alignItems="flex-start">
                     <div>
                         <Typography level="body-sm">{category}</Typography>
-                        <Typography level="title-md">
-                            <Link overlay underline="none" href="#interactive-card" sx={{ color: 'text.primary' }}>
-                                {title}
-                            </Link>
-                        </Typography>
+                        <Typography level="title-md">{title}</Typography>
                     </div>
                     <Stack direction="row" alignItems="center">
                         <IconButton
@@ -111,7 +127,7 @@ const Post = (props: PostProps) => {
                         >
                             <FavoriteRoundedIcon />
                         </IconButton>
-                        <Badge size="sm" badgeContent={comments} color="primary" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+                        <Badge size="sm" badgeContent={comments.length > 0 ? comments.length.toString() : '0' } color="primary" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
                             <MessageOutlinedIcon />
                         </Badge>
                     </Stack>
@@ -131,4 +147,4 @@ const Post = (props: PostProps) => {
     )
 }
 
-export default Post
+export default PostCard

@@ -16,7 +16,7 @@ import Header from '../components/header/Header'
 import Input from '@mui/joy/Input'
 import Modal from '@mui/joy/Modal'
 import Option from '@mui/joy/Option'
-import Post from '../components/posts/post'
+import PostCard from '../components/posts/PostCard'
 import Select from '@mui/joy/Select'
 import Stack from '@mui/joy/Stack'
 import Textarea from '@mui/joy/Textarea'
@@ -38,8 +38,6 @@ const Home = () => {
 
     useEffect(() => {
         fetchData()
-
-        //* Get user from local storage
         const user = JSON.parse(localStorage.getItem('user') || 'null')
         if (!user) {
             setActiveUser({ permissions: '' })
@@ -82,7 +80,7 @@ const Home = () => {
 
     const handleCategory = (event: any) => {
         if (event && event.target) {
-            setNewPostData({ ...newPostData, category: event.target.innerText })
+            setNewPostData({ ...newPostData, category: event.target.textContent })
         }
     }
 
@@ -145,12 +143,12 @@ const Home = () => {
                 )}
                 <Stack spacing={2} sx={{ overflow: 'auto' }}>
                     {posts.map((post) => (
-                        <Post key={post.id} title={post.title} category={post.category} image={post.image} datePosted={post.created} comments={post.comments.length} tags={post.tags} />
+                        <PostCard key={post.id} id={post.id} image={post.image} title={post.title} category={post.category} description={post.description} datePosted={post.created} comments={post.comments} tags={post.tags} />
                     ))}
                 </Stack>
             </Stack>
             <Modal open={openModal} onClose={handleModalClose}>
-                <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, minWidth: 600 }}>
+                <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, width: 600 }}>
                     <FormControl sx={{ mt: 2 }}>
                         <FormLabel>Title</FormLabel>
                         <Input placeholder="Title" variant="soft" value={newPostData.title} onChange={handleTitle} />
@@ -170,10 +168,24 @@ const Home = () => {
                         <FormLabel>Tags</FormLabel>
                         <Autocomplete variant="soft" placeholder="Tags" options={postTags} onChange={handleTags} multiple />
                     </FormControl>
-                    <Box sx={{ mt: 2 }}>
-                        <input type="file" onChange={handleImageUpload} />
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+                        <label htmlFor="upload-input">
+                            <Button component="span" variant="soft" color="primary">
+                                Upload Image
+                            </Button>
+                        </label>
+                        <input
+                            id="upload-input"
+                            type="file"
+                            onChange={handleImageUpload}
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                        />
                     </Box>
-                    <Box sx={{ mt: 2 }}>
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                        <Button color='danger' onClick={handleModalClose} loading={isLoading}>
+                            Cancel
+                        </Button>
                         <Button onClick={handleSubmit} loading={isLoading}>
                             Submit
                         </Button>

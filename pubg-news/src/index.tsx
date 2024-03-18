@@ -10,6 +10,7 @@ import '@fontsource/inter'
 import Login from './routes/auth/Login'
 import Home from './routes/Home'
 import NotFound from './routes/NotFound'
+import Post from './routes/Post'
 import Register from './routes/auth/Register'
 import reportWebVitals from './reportWebVitals'
 import UserProfile from './routes/auth/UserProfile'
@@ -23,6 +24,11 @@ const router = createBrowserRouter([
     {
         path: '/login',
         element: <Login />,
+        errorElement: <NotFound />,
+    },
+    {
+        path: '/post/:id',
+        element: <Post />,
         errorElement: <NotFound />,
     },
     {
